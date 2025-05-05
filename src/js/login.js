@@ -20,7 +20,7 @@
 import { refs } from './refs';
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
-import { saveInLs } from './storage';
+import { saveInLs, getFromLs, removeFromLs } from './storage';
 
 const USER_DATA = {
   email: 'user@mail.com',
@@ -33,6 +33,15 @@ refs.form.addEventListener('submit', onFormSubmit);
 
 function onFormSubmit(event) {
   event.preventDefault();
+
+  if (refs.buttonfirst.textContent === 'Logout') {
+    refs.form.reset();
+    refs.buttonfirst.textContent = 'Login';
+    refs.inputEmail.removeAttribute('readonly');
+    refs.inputPassword.removeAttribute('readonly');
+    removeFromLs(LS_KEY);
+    return;
+  }
 
   const emailValue = event.target.elements.email.value.trim();
   const passwordValue = event.target.elements.password.value.trim();
@@ -55,7 +64,15 @@ function onFormSubmit(event) {
   }
 
   saveInLs(LS_KEY, { email: emailValue, password: passwordValue });
+  refs.buttonfirst.textContent = 'Logout';
+  refs.inputEmail.setAttribute('readonly', true);
+  refs.inputPassword.setAttribute('readonly', true);
+}
 
+const savedData = getFromLs(LS_KEY);
+if (savedData) {
+  refs.inputEmail.value = savedData.email || '';
+  refs.inputPassword.value = savedData.password || '';
   refs.buttonfirst.textContent = 'Logout';
   refs.inputEmail.setAttribute('readonly', true);
   refs.inputPassword.setAttribute('readonly', true);
